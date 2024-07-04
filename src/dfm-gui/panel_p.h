@@ -6,9 +6,12 @@
 #define PANEL_P_H
 
 #include <dfm-gui/panel.h>
+<<<<<<< HEAD
 #include <dfm-gui/appletitem.h>
 #include <dfm-gui/shortcutmap.h>
 
+=======
+>>>>>>> 3fa180064 (refactor: mix QML and QtWidget)
 #include "containment_p.h"
 
 DFMGUI_BEGIN_NAMESPACE

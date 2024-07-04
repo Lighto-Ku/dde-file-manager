@@ -254,11 +254,15 @@ Q_CORE_EXPORT QDebug operator<<(QDebug out, const DPF_NAMESPACE::PluginQuickMeta
  */
 Q_CORE_EXPORT QDebug operator<<(QDebug out, const DPF_NAMESPACE::PluginQuickMetaPtr &quickMetaPtr)
 {
+<<<<<<< HEAD
     if (quickMetaPtr) {
         out << *quickMetaPtr;
     } else {
         out << "nullptr";
     }
+=======
+    out << *quickMetaPtr;
+>>>>>>> 3fa180064 (refactor: mix QML and QtWidget)
     return out;
 }
 
