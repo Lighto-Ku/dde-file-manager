@@ -42,11 +42,3 @@ install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR}/deepin-servi
 install(FILES ${PROJECT_NAME}.json DESTINATION share/deepin-service-manager/system/)
 install(FILES org.deepin.filemanager.mountcontrol.conf DESTINATION share/dbus-1/system.d/)
 INSTALL_DBUS_SERVICE(org.deepin.Filemanager.MountControl root)
-
-#set(PolicyDir "${CMAKE_INSTALL_PREFIX}/share/polkit-1/actions")
-#install(FILES polkit/com.deepin.filemanager.daemon.sharecontrol.policy DESTINATION ${PolicyDir})
-
-#execute_process(COMMAND qdbuscpp2xml sharecontroldbus.h -o ./sharecontroldbus.xml
-#    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-#execute_process(COMMAND qdbusxml2cpp -i ../sharecontroldbus.h -c ShareControlAdapter -l ShareControlDBus -a dbusadapter/sharecontrol_adapter sharecontroldbus.xml
-#    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})

@@ -32,9 +32,9 @@ QT_END_NAMESPACE
 class AccessControlManagerAdaptor : public QDBusAbstractAdaptor
 {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "org.deepin.filemanager.AccessControlManager")
+    Q_CLASSINFO("D-Bus Interface", "org.deepin.Filemanager.AccessControlManager")
     Q_CLASSINFO("D-Bus Introspection", ""
-                                       "  <interface name=\"org.deepin.filemanager.AccessControlManager\">\n"
+                                       "  <interface name=\"org.deepin.Filemanager.AccessControlManager\">\n"
                                        "    <signal name=\"AccessPolicySetFinished\">\n"
                                        "      <arg direction=\"out\" type=\"a{sv}\" name=\"policy\"/>\n"
                                        "      <annotation value=\"QVariantMap\" name=\"org.qtproject.QtDBus.QtTypeName.Out0\"/>\n"
