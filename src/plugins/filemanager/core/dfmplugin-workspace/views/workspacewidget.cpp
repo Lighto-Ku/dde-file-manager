@@ -40,7 +40,7 @@ WorkspaceWidget::WorkspaceWidget(QFrame *parent)
     : AbstractFrame(parent)
 {
     initializeUi();
-    initConnect();
+    // initConnect();
 }
 
 WorkspaceWidget::ViewPtr WorkspaceWidget::currentViewPtr() const
@@ -65,14 +65,10 @@ Global::ViewMode WorkspaceWidget::currentViewMode() const
 
 void WorkspaceWidget::setCurrentUrl(const QUrl &url)
 {
-    if (!tabBar->currentTab())
-        tabBar->createTab();
-
     auto curView = currentViewPtr();
     if (curView) {
         if (UniversalUtils::urlEquals(url, curView->rootUrl())
-            && UniversalUtils::urlEquals(url, tabBar->currentTab()->getCurrentUrl())
-            && !dpfHookSequence->run("dfmplugin_workspace", "hook_Tab_Allow_Repeat_Url", url, tabBar->currentTab()->getCurrentUrl()))
+            && !dpfHookSequence->run("dfmplugin_workspace", "hook_Tab_Allow_Repeat_Url", url, curView->rootUrl()))
             return;
 
         bool animEnable = DConfigManager::instance()->value(kAnimationDConfName, kAnimationEnable, true).toBool();
@@ -153,45 +149,6 @@ AbstractBaseView *WorkspaceWidget::currentView()
     return views.value(scheme);
 }
 
-void WorkspaceWidget::openNewTab(const QUrl &url)
-{
-    if (!tabBar->tabAddable())
-        return;
-
-    tabBar->createTab();
-
-    auto windowID = WorkspaceHelper::instance()->windowId(this);
-    if (url.isEmpty())
-        WorkspaceEventCaller::sendChangeCurrentUrl(windowID, StandardPaths::location(StandardPaths::kHomePath));
-
-    WorkspaceEventCaller::sendChangeCurrentUrl(windowID, url);
-}
-
-bool WorkspaceWidget::canAddNewTab()
-{
-    if (tabBar)
-        return tabBar->tabAddable();
-
-    return false;
-}
-
-void WorkspaceWidget::closeTab(quint64 winId, const QUrl &url)
-{
-    if (tabBar)
-        tabBar->closeTab(winId, url);
-}
-
-void WorkspaceWidget::setTabAlias(const QUrl &url, const QString &newName)
-{
-    if (tabBar) {
-        for (int i = 0; i < tabBar->count(); ++i) {
-            auto tab = tabBar->tabAt(i);
-            if (tab && UniversalUtils::urlEquals(url, tab->getCurrentUrl()))
-                tab->setTabAlias(newName);
-        }
-    }
-}
-
 void WorkspaceWidget::setCustomTopWidgetVisible(const QString &scheme, bool visible)
 {
     if (topWidgets.contains(scheme)) {
@@ -201,7 +158,7 @@ void WorkspaceWidget::setCustomTopWidgetVisible(const QString &scheme, bool visi
         if (interface) {
             TopWidgetPtr topWidgetPtr = QSharedPointer<QWidget>(interface->create(this));
             if (topWidgetPtr) {
-                widgetLayout->insertWidget(widgetLayout->indexOf(tabBottomLine) + 1, topWidgetPtr.get());
+                widgetLayout->insertWidget(0, topWidgetPtr.get());
                 topWidgets.insert(scheme, topWidgetPtr);
                 topWidgetPtr->setVisible(visible);
             }
@@ -247,24 +204,24 @@ QRectF WorkspaceWidget::itemRect(const QUrl &url, const Global::ItemRoles role)
     return {};
 }
 
-void WorkspaceWidget::onCloseCurrentTab()
-{
-    if (tabBar->count() == 1) {
-        auto winId = WorkspaceHelper::instance()->windowId(this);
-        auto window = FMWindowsIns.findWindowById(winId);
-        if (window)
-            window->close();
+// void WorkspaceWidget::onCloseCurrentTab()
+// {
+//     if (tabBar->count() == 1) {
+//         auto winId = WorkspaceHelper::instance()->windowId(this);
+//         auto window = FMWindowsIns.findWindowById(winId);
+//         if (window)
+//             window->close();
 
-        return;
-    }
+//         return;
+//     }
 
-    tabBar->removeTab(tabBar->getCurrentIndex());
-}
+//     tabBar->removeTab(tabBar->getCurrentIndex());
+// }
 
-void WorkspaceWidget::onSetCurrentTabIndex(const int index)
-{
-    tabBar->setCurrentIndex(index);
-}
+// void WorkspaceWidget::onSetCurrentTabIndex(const int index)
+// {
+//     tabBar->setCurrentIndex(index);
+// }
 
 void WorkspaceWidget::onRefreshCurrentView()
 {
@@ -308,85 +265,85 @@ void WorkspaceWidget::handleViewStateChanged()
     appearAnimDelayTimer->start();
 }
 
-void WorkspaceWidget::onOpenUrlInNewTab(quint64 windowId, const QUrl &url)
-{
-    quint64 thisWindowID = WorkspaceHelper::instance()->windowId(this);
-    if (thisWindowID == windowId)
-        openNewTab(url);
-}
+// void WorkspaceWidget::onOpenUrlInNewTab(quint64 windowId, const QUrl &url)
+// {
+//     quint64 thisWindowID = WorkspaceHelper::instance()->windowId(this);
+//     if (thisWindowID == windowId)
+//         openNewTab(url);
+// }
 
-void WorkspaceWidget::onCurrentTabChanged(int tabIndex)
-{
-    Tab *tab = tabBar->tabAt(tabIndex);
-    if (tab) {
-        auto windowID = WorkspaceHelper::instance()->windowId(this);
-        // switch tab must before change url! otherwise NavWidget can not work!
-        WorkspaceEventCaller::sendTabChanged(windowID, tabIndex);
-        WorkspaceEventCaller::sendChangeCurrentUrl(windowID, tab->getCurrentUrl());
-    }
-}
+// void WorkspaceWidget::onCurrentTabChanged(int tabIndex)
+// {
+//     Tab *tab = tabBar->tabAt(tabIndex);
+//     if (tab) {
+//         auto windowID = WorkspaceHelper::instance()->windowId(this);
+//         // switch tab must before change url! otherwise NavWidget can not work!
+//         WorkspaceEventCaller::sendTabChanged(windowID, tabIndex);
+//         WorkspaceEventCaller::sendChangeCurrentUrl(windowID, tab->getCurrentUrl());
+//     }
+// }
 
-void WorkspaceWidget::onRequestCloseTab(const int index, const bool &remainState)
-{
-    tabBar->removeTab(index, remainState);
-}
+// void WorkspaceWidget::onRequestCloseTab(const int index, const bool &remainState)
+// {
+//     tabBar->removeTab(index, remainState);
+// }
 
-void WorkspaceWidget::onTabAddableChanged(bool addable)
-{
-    newTabButton->setEnabled(addable);
-}
+// void WorkspaceWidget::onTabAddableChanged(bool addable)
+// {
+//     newTabButton->setEnabled(addable);
+// }
 
-void WorkspaceWidget::showNewTabButton()
-{
-    newTabButton->show();
-    tabTopLine->show();
-    tabBottomLine->show();
-}
+// void WorkspaceWidget::showNewTabButton()
+// {
+//     newTabButton->show();
+//     tabTopLine->show();
+//     tabBottomLine->show();
+// }
 
-void WorkspaceWidget::hideNewTabButton()
-{
-    newTabButton->hide();
-    tabTopLine->hide();
-    tabBottomLine->hide();
-}
+// void WorkspaceWidget::hideNewTabButton()
+// {
+//     newTabButton->hide();
+//     tabTopLine->hide();
+//     tabBottomLine->hide();
+// }
 
-void WorkspaceWidget::onNewTabButtonClicked()
-{
-    QUrl url = Application::instance()->appUrlAttribute(Application::kUrlOfNewTab);
+// void WorkspaceWidget::onNewTabButtonClicked()
+// {
+//     QUrl url = Application::instance()->appUrlAttribute(Application::kUrlOfNewTab);
 
-    if (!url.isValid()) {
-        url = currentUrl();
-    }
+//     if (!url.isValid()) {
+//         url = currentUrl();
+//     }
 
-    openNewTab(url);
-}
+//     openNewTab(url);
+// }
 
-void WorkspaceWidget::onNextTab()
-{
-    tabBar->activateNextTab();
-}
+// void WorkspaceWidget::onNextTab()
+// {
+//     tabBar->activateNextTab();
+// }
 
-void WorkspaceWidget::onPreviousTab()
-{
-    tabBar->activatePreviousTab();
-}
+// void WorkspaceWidget::onPreviousTab()
+// {
+//     tabBar->activatePreviousTab();
+// }
 
-void WorkspaceWidget::onCreateNewTab()
-{
-    // If a directory is selected, open NewTab through the URL of the selected directory
-    auto view = currentView();
-    if (view) {
-        const QList<QUrl> &urls = view->selectedUrlList();
-        if (urls.count() == 1) {
-            const FileInfoPointer &fileInfoPtr = InfoFactory::create<FileInfo>(urls.at(0));
-            if (fileInfoPtr && fileInfoPtr->isAttributes(OptInfoType::kIsDir)) {
-                openNewTab(urls.at(0));
-                return;
-            }
-        }
-    }
-    openNewTab(tabBar->currentTab()->getCurrentUrl());
-}
+// void WorkspaceWidget::onCreateNewTab()
+// {
+//     // If a directory is selected, open NewTab through the URL of the selected directory
+//     auto view = currentView();
+//     if (view) {
+//         const QList<QUrl> &urls = view->selectedUrlList();
+//         if (urls.count() == 1) {
+//             const FileInfoPointer &fileInfoPtr = InfoFactory::create<FileInfo>(urls.at(0));
+//             if (fileInfoPtr && fileInfoPtr->isAttributes(OptInfoType::kIsDir)) {
+//                 openNewTab(urls.at(0));
+//                 return;
+//             }
+//         }
+//     }
+//     openNewTab(tabBar->currentTab()->getCurrentUrl());
+// }
 
 void WorkspaceWidget::showEvent(QShowEvent *event)
 {
@@ -407,75 +364,67 @@ void WorkspaceWidget::focusInEvent(QFocusEvent *event)
 // NOTE(zhangs): please ref to: DFileManagerWindow::initRightView (old filemanager)
 void WorkspaceWidget::initializeUi()
 {
-    initTabBar();
+    // initTabBar();
     initViewLayout();
 }
 
-void WorkspaceWidget::initConnect()
-{
-    connect(WorkspaceHelper::instance(), &WorkspaceHelper::openNewTab, this, &WorkspaceWidget::onOpenUrlInNewTab);
+// void WorkspaceWidget::initConnect()
+// {
+// #ifdef DTKWIDGET_CLASS_DSizeMode
+//     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::sizeModeChanged, this, [this]() {
+//         initUiForSizeMode();
+//     });
+// #endif
+// }
 
-    QObject::connect(tabBar, &TabBar::currentChanged, this, &WorkspaceWidget::onCurrentTabChanged);
-    QObject::connect(tabBar, &TabBar::tabCloseRequested, this, &WorkspaceWidget::onRequestCloseTab);
-    QObject::connect(tabBar, &TabBar::tabAddableChanged, this, &WorkspaceWidget::onTabAddableChanged);
-    QObject::connect(tabBar, &TabBar::tabBarShown, this, &WorkspaceWidget::showNewTabButton);
-    QObject::connect(tabBar, &TabBar::tabBarHidden, this, &WorkspaceWidget::hideNewTabButton);
-    QObject::connect(newTabButton, &DIconButton::clicked, this, &WorkspaceWidget::onNewTabButtonClicked);
-#ifdef DTKWIDGET_CLASS_DSizeMode
-    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::sizeModeChanged, this, [this]() {
-        initUiForSizeMode();
-    });
-#endif
-}
+// void WorkspaceWidget::initTabBar()
+// {
+//     tabBar = new TabBar(this);
 
-void WorkspaceWidget::initTabBar()
-{
-    tabBar = new TabBar(this);
+//     newTabButton = new DIconButton(this);
+//     newTabButton->setObjectName("NewTabButton");
+//     newTabButton->setIconSize({ 24, 24 });
+//     newTabButton->setIcon(QIcon::fromTheme("dfm_tab_new"));
+//     newTabButton->setFlat(true);
+//     newTabButton->hide();
 
-    newTabButton = new DIconButton(this);
-    newTabButton->setObjectName("NewTabButton");
-    newTabButton->setIconSize({ 24, 24 });
-    newTabButton->setIcon(QIcon::fromTheme("dfm_tab_new"));
-    newTabButton->setFlat(true);
-    newTabButton->hide();
+//     initUiForSizeMode();
 
-    initUiForSizeMode();
+//     tabTopLine = new DHorizontalLine(this);
+//     tabBottomLine = new DHorizontalLine(this);
+//     tabTopLine->setFixedHeight(1);
+//     tabBottomLine->setFixedHeight(1);
+//     tabTopLine->hide();
+//     tabBottomLine->hide();
 
-    tabTopLine = new DHorizontalLine(this);
-    tabBottomLine = new DHorizontalLine(this);
-    tabTopLine->setFixedHeight(1);
-    tabBottomLine->setFixedHeight(1);
-    tabTopLine->hide();
-    tabBottomLine->hide();
+//     tabBarLayout = new QHBoxLayout;
+//     tabBarLayout->setContentsMargins(0, 0, 0, 0);
+//     tabBarLayout->setSpacing(0);
+//     tabBarLayout->addWidget(tabBar);
+//     tabBarLayout->addWidget(newTabButton);
+// #ifdef ENABLE_TESTING
+//     dpfSlotChannel->push("dfmplugin_utils", "slot_Accessible_SetAccessibleName",
+//                          qobject_cast<TabBar *>(tabBar), AcName::kAcViewTabBar);
+//     dpfSlotChannel->push("dfmplugin_utils", "slot_Accessible_SetAccessibleName",
+//                          qobject_cast<DHorizontalLine *>(tabTopLine), AcName::kAcViewTabBarTopLine);
+//     dpfSlotChannel->push("dfmplugin_utils", "slot_Accessible_SetAccessibleName",
+//                          qobject_cast<DIconButton *>(newTabButton), AcName::kAcViewTabBarNewButton);
+//     dpfSlotChannel->push("dfmplugin_utils", "slot_Accessible_SetAccessibleName",
+//                          qobject_cast<DHorizontalLine *>(tabBottomLine), AcName::kAcViewTabBarBottomLine);
+// #endif
+// }
 
-    tabBarLayout = new QHBoxLayout;
-    tabBarLayout->setContentsMargins(0, 0, 0, 0);
-    tabBarLayout->setSpacing(0);
-    tabBarLayout->addWidget(tabBar);
-    tabBarLayout->addWidget(newTabButton);
-#ifdef ENABLE_TESTING
-    dpfSlotChannel->push("dfmplugin_utils", "slot_Accessible_SetAccessibleName",
-                         qobject_cast<TabBar *>(tabBar), AcName::kAcViewTabBar);
-    dpfSlotChannel->push("dfmplugin_utils", "slot_Accessible_SetAccessibleName",
-                         qobject_cast<DHorizontalLine *>(tabTopLine), AcName::kAcViewTabBarTopLine);
-    dpfSlotChannel->push("dfmplugin_utils", "slot_Accessible_SetAccessibleName",
-                         qobject_cast<DIconButton *>(newTabButton), AcName::kAcViewTabBarNewButton);
-    dpfSlotChannel->push("dfmplugin_utils", "slot_Accessible_SetAccessibleName",
-                         qobject_cast<DHorizontalLine *>(tabBottomLine), AcName::kAcViewTabBarBottomLine);
-#endif
-}
-
-void WorkspaceWidget::initUiForSizeMode()
-{
-#ifdef DTKWIDGET_CLASS_DSizeMode
-    int size = DSizeModeHelper::element(24, 36);
-    tabBar->setFixedHeight(size);
-    newTabButton->setFixedSize(size, size);
-#else
-    tabBar->setFixedHeight(36);
-    newTabButton->setFixedSize(36, 36);
-#endif
-}
+// void WorkspaceWidget::initUiForSizeMode()
+// {
+// #ifdef DTKWIDGET_CLASS_DSizeMode
+//     int size = DSizeModeHelper::element(24, 36);
+//     tabBar->setFixedHeight(size);
+//     newTabButton->setFixedSize(size, size);
+// #else
+//     tabBar->setFixedHeight(36);
+//     newTabButton->setFixedSize(36, 36);
+// #endif
+// }
 
 void WorkspaceWidget::onAnimDelayTimeout()
 {
@@ -520,9 +469,9 @@ void WorkspaceWidget::initViewLayout()
     viewStackLayout->setContentsMargins(0, 0, 0, 0);
 
     widgetLayout = new QVBoxLayout;
-    widgetLayout->addWidget(tabTopLine);
-    widgetLayout->addLayout(tabBarLayout);
-    widgetLayout->addWidget(tabBottomLine);
+    // widgetLayout->addWidget(tabTopLine);
+    // widgetLayout->addLayout(tabBarLayout);
+    // widgetLayout->addWidget(tabBottomLine);
     widgetLayout->addLayout(viewStackLayout, 1);
     widgetLayout->setSpacing(0);
     widgetLayout->setContentsMargins(0, 0, 0, 0);
@@ -571,7 +520,7 @@ void WorkspaceWidget::initCustomTopWidgets(const QUrl &url)
     } else {
         TopWidgetPtr topWidgetPtr = QSharedPointer<QWidget>(interface->create());
         if (topWidgetPtr) {
-            widgetLayout->insertWidget(widgetLayout->indexOf(tabBottomLine) + 1, topWidgetPtr.get());
+            widgetLayout->insertWidget(0, topWidgetPtr.get());
             topWidgets.insert(scheme, topWidgetPtr);
             topWidgetPtr->setVisible(interface->isShowFromUrl(topWidgets[scheme].data(), url) || interface->isKeepShow());
         }
@@ -589,7 +538,7 @@ void WorkspaceWidget::setCurrentView(const QUrl &url)
     if (canPlayAppearAnimation && enterAnim)
         enterAnim->raise();
 
-    tabBar->setCurrentUrl(url);
+    // tabBar->setCurrentUrl(url);
     initCustomTopWidgets(url);
 
     view->setRootUrl(url);

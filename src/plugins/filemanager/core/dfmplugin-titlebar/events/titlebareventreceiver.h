@@ -40,6 +40,9 @@ public slots:
     void handleWindowBackward(quint64 windowId);
     void handleRemoveHistory(quint64 windowId, const QUrl &url);
 
+    bool handleTabAddable(quint64 windowId);
+    void handleOpenNewTabTriggered(quint64 windowId, const QUrl &url);
+
 private:
     explicit TitleBarEventReceiver(QObject *parent = nullptr);
 };

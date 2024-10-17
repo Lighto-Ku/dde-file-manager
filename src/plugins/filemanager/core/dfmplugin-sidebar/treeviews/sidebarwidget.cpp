@@ -22,6 +22,8 @@
 #include <dfm-base/base/application/application.h>
 #include <dfm-base/utils/dialogmanager.h>
 
+#include <dframe.h>
+
 #include <QApplication>
 #include <QVBoxLayout>
 #include <QScrollBar>
@@ -321,11 +323,11 @@ void SideBarWidget::onItemRenamed(const QModelIndex &index, const QString &newNa
 
 void SideBarWidget::initializeUi()
 {
-    QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect(this);
-    effect->setColor(QColor(0, 0, 0, 5));
-    effect->setOffset(4, 0);
-    effect->setBlurRadius(20);
-    setGraphicsEffect(effect);
+    // QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect(this);
+    // effect->setColor(QColor(0, 0, 0, 5));
+    // effect->setOffset(4, 0);
+    // effect->setBlurRadius(20);
+    // setGraphicsEffect(effect);
 
     QHBoxLayout *hlayout = new QHBoxLayout(this);
     hlayout->setContentsMargins(0, 0, 0, 0);
@@ -342,6 +344,11 @@ void SideBarWidget::initializeUi()
 
     hlayout->addWidget(leftSpacer);
     hlayout->addLayout(vlayout);
+
+    DVerticalLine *line = new DVerticalLine(this);
+    line->setContentsMargins(0, 0, 0, 0);
+    line->setVisible(true);
+    hlayout->addWidget(line);
 
     sidebarView->setModel(kSidebarModelIns.data());
     kSidebarModelIns->addEmptyItem();

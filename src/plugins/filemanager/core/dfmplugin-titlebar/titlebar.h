@@ -24,6 +24,11 @@ class TitleBar : public dpf::Plugin
     DPF_EVENT_REG_SIGNAL(signal_InputAdddressStr_Check)
     DPF_EVENT_REG_SIGNAL(signal_Share_SetPassword)
 
+    DPF_EVENT_REG_SIGNAL(signal_Tab_Added)
+    DPF_EVENT_REG_SIGNAL(signal_Tab_Changed)
+    DPF_EVENT_REG_SIGNAL(signal_Tab_Moved)
+    DPF_EVENT_REG_SIGNAL(signal_Tab_Removed)
+
     // slot events
     DPF_EVENT_REG_SLOT(slot_Custom_Register)
     DPF_EVENT_REG_SLOT(slot_Spinner_Start)
@@ -35,10 +40,19 @@ class TitleBar : public dpf::Plugin
     DPF_EVENT_REG_SLOT(slot_Navigator_Remove)
     DPF_EVENT_REG_SLOT(slot_ServerDialog_RemoveHistory)
 
+    DPF_EVENT_REG_SLOT(slot_Tab_Addable)
+    DPF_EVENT_REG_SLOT(slot_Tab_Close)
+    DPF_EVENT_REG_SLOT(slot_Tab_SetAlias)
+
     // hook events
     DPF_EVENT_REG_HOOK(hook_Crumb_Seprate)
     DPF_EVENT_REG_HOOK(hook_Show_Addr)
     DPF_EVENT_REG_HOOK(hook_Copy_Addr)
+
+    DPF_EVENT_REG_HOOK(hook_Tab_SetTabName)
+    DPF_EVENT_REG_HOOK(hook_Tab_Closeable)
+    DPF_EVENT_REG_HOOK(hook_Tab_Allow_Repeat_Url)
+    DPF_EVENT_REG_HOOK(hook_Tab_FileDeleteNotCdComputer)
 
 public:
     virtual void initialize() override;

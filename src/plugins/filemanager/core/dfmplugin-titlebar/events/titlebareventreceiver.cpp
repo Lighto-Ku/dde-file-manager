@@ -9,7 +9,7 @@
 #include "utils/crumbinterface.h"
 #include "utils/titlebarhelper.h"
 #include "utils/optionbuttonmanager.h"
-
+#include "utils/tabbarmanager.h"
 using namespace dfmplugin_titlebar;
 TitleBarEventReceiver *TitleBarEventReceiver::instance()
 {
@@ -150,4 +150,14 @@ void TitleBarEventReceiver::handleRemoveHistory(quint64 windowId, const QUrl &ur
 TitleBarEventReceiver::TitleBarEventReceiver(QObject *parent)
     : QObject(parent)
 {
+}
+
+bool TitleBarEventReceiver::handleTabAddable(quint64 windowId)
+{
+    return TabBarManager::instance()->canAddNewTab(windowId);
+}
+
+void TitleBarEventReceiver::handleOpenNewTabTriggered(quint64 windowId, const QUrl &url)
+{
+    TabBarManager::instance()->openNewTab(windowId, url);
 }

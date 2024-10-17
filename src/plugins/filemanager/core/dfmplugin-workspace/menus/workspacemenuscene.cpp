@@ -174,7 +174,8 @@ void WorkspaceMenuScene::updateState(DMenu *parent)
     if (d->focusFileInfo && FileUtils::isDesktopFileInfo(d->focusFileInfo)
             && !d->focusFileInfo->canAttributes(CanableInfoType::kCanRename))
         renameEnabled = false;
-    if (currentWidget && !currentWidget->canAddNewTab()) {
+    // TODO call title bar event to check canAddNewTab
+    if (currentWidget /*&& !currentWidget->canAddNewTab()*/) {
         auto actions = parent->actions();
         for (auto act : actions) {
             const auto &actId = act->property(ActionPropertyKey::kActionID);

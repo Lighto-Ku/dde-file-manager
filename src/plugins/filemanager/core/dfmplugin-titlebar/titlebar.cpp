@@ -45,6 +45,7 @@ bool TitleBar::start()
 void TitleBar::onWindowCreated(quint64 windId)
 {
     TitleBarWidget *titleWidget = new TitleBarWidget;
+    titleWidget->initTabBar(windId);
 #ifdef ENABLE_TESTING
     dpfSlotChannel->push("dfmplugin_utils", "slot_Accessible_SetAccessibleName",
                          qobject_cast<QWidget *>(titleWidget), AcName::kAcComputerTitleBar);
@@ -73,6 +74,11 @@ void TitleBar::onWindowOpened(quint64 windId)
     connect(window, &FileManagerWindow::reqSearchCtrlF, titleBarWidget, &TitleBarWidget::handleHotkeyCtrlF);
     connect(window, &FileManagerWindow::reqSearchCtrlL, titleBarWidget, &TitleBarWidget::handleHotkeyCtrlL);
     connect(window, &FileManagerWindow::reqTriggerActionByIndex, titleBarWidget, &TitleBarWidget::handleHotketSwitchViewMode);
+    connect(window, &FileManagerWindow::reqActivateNextTab, titleBarWidget, &TitleBarWidget::handleHotketNextTab);
+    connect(window, &FileManagerWindow::reqActivatePreviousTab, titleBarWidget, &TitleBarWidget::handleHotketPreviousTab);
+    connect(window, &FileManagerWindow::reqCreateTab, titleBarWidget, &TitleBarWidget::handleHotketCreateNewTab);
+    connect(window, &FileManagerWindow::reqCloseCurrentTab, titleBarWidget, &TitleBarWidget::handleHotketCloseCurrentTab);
+    connect(window, &FileManagerWindow::reqActivateTabByIndex, titleBarWidget, &TitleBarWidget::handleHotketActivateTab);
 }
 
 void TitleBar::onWindowClosed(quint64 windId)
@@ -93,6 +99,8 @@ void TitleBar::bindEvents()
 
     dpfSignalDispatcher->subscribe(DFMBASE_NAMESPACE::kSwitchViewMode,
                                    TitleBarEventReceiver::instance(), &TitleBarEventReceiver::handleViewModeChanged);
+    dpfSignalDispatcher->subscribe(DFMBASE_NAMESPACE::kOpenNewTab,
+                                   TitleBarEventReceiver::instance(), &TitleBarEventReceiver::handleOpenNewTabTriggered);
 
     // bind self slot events  slot_Spinner_Start
     static constexpr auto curSpace { DPF_MACRO_TO_STR(DPTITLEBAR_NAMESPACE) };

@@ -30,6 +30,9 @@ inline constexpr int kIconHeight { 14 };
 inline constexpr int kItemHeight { 30 };
 inline constexpr int kItemMargin { 8 };
 inline constexpr int kCompleterMaxHeight { 260 };
+inline constexpr int kToolButtonSize { 30 };
+inline constexpr int kToolButtonIconSize { 14 };
+inline constexpr int kMaxTabCount { 8 };
 
 namespace CustomKey {
 inline constexpr char kUrl[] { "CrumbData_Key_Url" };
@@ -126,7 +129,6 @@ inline constexpr char kAcComputerTitleBar[] { "computer_title_bar" };
 inline constexpr char kAcComputerTitleBarAddress[] { "AddressToolBar" };
 inline constexpr char kAcComputerTitleBarBackBtn[] { "back_button" };
 inline constexpr char kAcComputerTitleBarForwardBtn[] { "forword_button" };
-inline constexpr char kAcComputerTitleBarBtnBox[] { "button_box" };
 inline constexpr char kAcComputerTitleBarSearchBtn[] { "search_button" };
 inline constexpr char kAcComputerTitleBarDetailBtn[] { "detail_button" };
 inline constexpr char kAcComputerTitleBarListViewBtn[] { "listView_button" };
@@ -143,5 +145,6 @@ inline constexpr char kAcComputerCrumbBarListView[] { "crumb_list_view" };
 DPTITLEBAR_END_NAMESPACE
 Q_DECLARE_METATYPE(QList<QVariantMap> *);
 Q_DECLARE_METATYPE(QUrl *);
+Q_DECLARE_METATYPE(QString *);
 
 #endif   // DFMPLUGIN_TITLEBAR_GLOBAL_H
