@@ -7,7 +7,7 @@
 
 #include "searchmanager/searcher/abstractsearcher.h"
 
-#include <QTime>
+#include <QElapsedTimer>
 #include <QMutex>
 #include <QRegularExpression>
 
@@ -37,7 +37,7 @@ private:
     QRegularExpression regex;
 
     //计时
-    QTime notifyTimer;
+    QElapsedTimer notifyTimer;
     int lastEmit = 0;
 };
 

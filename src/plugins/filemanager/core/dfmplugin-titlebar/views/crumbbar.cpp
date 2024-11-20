@@ -403,7 +403,7 @@ void CrumbBar::enterEvent(QEvent *event)
 
 void CrumbBar::leaveEvent(QEvent *event)
 {
-    QFrame::enterEvent(event);
+    QFrame::leaveEvent(event);
     if (d->hoverFlag) {
         d->hoverFlag = false;
         update();

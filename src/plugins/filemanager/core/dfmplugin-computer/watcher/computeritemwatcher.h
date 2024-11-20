@@ -126,7 +126,7 @@ private:
     QSharedPointer<DFMBASE_NAMESPACE::LocalFileWatcher> appEntryWatcher { nullptr };
     QMap<QString, int> groupIds;
 
-    QMap<QUrl, QUrl> routeMapper;
+    QMultiMap<QUrl, QUrl> routeMapper;
 };
 }
 #endif   // COMPUTERITEMWATCHER_H

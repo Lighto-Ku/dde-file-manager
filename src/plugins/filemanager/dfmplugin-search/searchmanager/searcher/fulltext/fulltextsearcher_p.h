@@ -12,7 +12,7 @@
 #include <QStandardPaths>
 #include <QApplication>
 #include <QMutex>
-#include <QTime>
+#include <QElapsedTimer>
 
 DPSEARCH_BEGIN_NAMESPACE
 
@@ -74,7 +74,7 @@ private:
     QMap<QString, QString> bindPathTable;
 
     //计时
-    QTime notifyTimer;
+    QElapsedTimer notifyTimer;
     int lastEmit = 0;
 
     FullTextSearcher *q = nullptr;

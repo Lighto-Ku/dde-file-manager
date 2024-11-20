@@ -10,29 +10,9 @@ FILE(GLOB_RECURSE WORKSPACE_FILES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.json"
     )
 
-add_library(${PROJECT_NAME}
-    SHARED
-    ${WORKSPACE_FILES}
-)
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${DFM_BUILD_PLUGIN_FILEMANAGER_DIR})
-
-find_package(Dtk COMPONENTS Widget REQUIRED)
-
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${Qt5Widgets_PRIVATE_INCLUDE_DIRS}
-)
-
-target_link_libraries(${PROJECT_NAME}
-    DFM::base
-    DFM::framework
-)
-
-#install library file
-install(TARGETS
-    ${PROJECT_NAME}
-    LIBRARY
-    DESTINATION
-    ${DFM_PLUGIN_FILEMANAGER_CORE_DIR}
-)
+# Qt6
+if (DFM_BUILD_WITH_QT6)
+    include(dfmplugin-workspace-qt6.cmake)
+else()
+    include(dfmplugin-workspace-qt5.cmake)
+endif()

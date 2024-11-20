@@ -401,10 +401,13 @@ bool ComputerItemWatcher::hide3rdEntries()
 
 QList<QUrl> ComputerItemWatcher::disksHiddenByDConf()
 {
-    const auto &&currHiddenDisks = DConfigManager::instance()->value(kDefaultCfgPath, kKeyHideDisk).toStringList().toSet();
-    const auto &&allBlockUUIDs = ComputerUtils::allValidBlockUUIDs().toSet();
+    const auto &&currHiddenDisksList = DConfigManager::instance()->value(kDefaultCfgPath, kKeyHideDisk).toStringList();
+    const auto &&currHiddenDisks = QSet<QString>(currHiddenDisksList.cbegin(), currHiddenDisksList.cend());
+    const auto &&allBlockUUIDsList = ComputerUtils::allValidBlockUUIDs();
+    const auto &&allBlockUUIDs = QSet<QString>(allBlockUUIDsList.cbegin(), allBlockUUIDsList.cend());
+
     const auto &&needToBeHidden = currHiddenDisks - (currHiddenDisks - allBlockUUIDs);   // setA ∩ setB
-    const auto &&devUrls = ComputerUtils::blkDevUrlByUUIDs(needToBeHidden.toList());
+    const auto &&devUrls = ComputerUtils::blkDevUrlByUUIDs(QStringList(needToBeHidden.begin(), needToBeHidden.end()));
     return devUrls;
 }
 
@@ -412,8 +415,10 @@ QList<QUrl> ComputerItemWatcher::disksHiddenBySettingPanel()
 {
     // hidden by setting panel: no system disk
     // hidden by setting panel: no loop device
-    auto systemBlocksAndLoop = DevProxyMng->getAllBlockIds(GlobalServerDefines::DeviceQueryOption::kSystem).toSet();
-    auto loopOnly = DevProxyMng->getAllBlockIds(GlobalServerDefines::DeviceQueryOption::kLoop).toSet();
+    auto systemBlocksAndLoopList = DevProxyMng->getAllBlockIds(GlobalServerDefines::DeviceQueryOption::kSystem);
+    auto loopOnlyList = DevProxyMng->getAllBlockIds(GlobalServerDefines::DeviceQueryOption::kLoop);
+    const auto &&systemBlocksAndLoop = QSet<QString>(systemBlocksAndLoopList.cbegin(), systemBlocksAndLoopList.cend());
+    const auto &&loopOnly = QSet<QString>(loopOnlyList.cbegin(), loopOnlyList.cend());
 
     bool hideSys = ComputerUtils::shouldSystemPartitionHide();
     bool hideLoop = ComputerUtils::shouldLoopPartitionsHide();
@@ -439,7 +444,11 @@ QList<QUrl> ComputerItemWatcher::hiddenPartitions()
     QList<QUrl> hiddenUrls;
     hiddenUrls += disksHiddenByDConf();
     hiddenUrls += disksHiddenBySettingPanel();
-    hiddenUrls = QList<QUrl>::fromSet(hiddenUrls.toSet());
+
+    // remove duplicate items
+    std::sort(hiddenUrls.begin(), hiddenUrls.end());
+    hiddenUrls.erase(std::unique(hiddenUrls.begin(), hiddenUrls.end()), hiddenUrls.end());
+
     return hiddenUrls;
 }
 
@@ -751,7 +760,9 @@ void ComputerItemWatcher::startQueryItems(bool async)
 
     if (async) {
         QFutureWatcher<ComputerDataList> *fw { new QFutureWatcher<ComputerDataList>() };
-        fw->setFuture(QtConcurrent::run(this, &ComputerItemWatcher::items));
+        fw->setFuture(QtConcurrent::run([this]() {
+            return this->items();
+        }));
         // if computer view is not init view, no receiver to receive the signal, cause when cd to computer view, shows empty.
         // on initialize computer view/model, get the cached items in construction.
         connect(fw, &QFutureWatcher<void>::finished, this, [fw, afterQueryFunc, this]() {

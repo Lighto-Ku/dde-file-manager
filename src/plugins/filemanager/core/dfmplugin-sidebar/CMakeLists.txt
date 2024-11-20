@@ -12,60 +12,45 @@ if (SIDEBAR_TREEVIEW)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/treeviews)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/treemodels)
     FILE(GLOB SIDEBAR_FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/utils/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/utils/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/events/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/events/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/treemodels/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/treemodels/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/treeviews/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/treeviews/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/treeviews/private/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.json"
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/utils/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/utils/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/events/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/events/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/treemodels/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/treemodels/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/treeviews/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/treeviews/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/treeviews/private/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.json"
     )
 else()
     message("Sidebar is implemented with list view")
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/views)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/models)
-FILE(GLOB SIDEBAR_FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/utils/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/utils/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/events/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/events/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/models/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/models/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/views/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/views/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/views/private/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.json"
+    FILE(GLOB SIDEBAR_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/utils/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/utils/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/events/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/events/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/models/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/models/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/views/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/views/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/views/private/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.json"
     )
 endif()
 
-find_package(Qt5 COMPONENTS Core)
-add_library(${PROJECT_NAME}
-    SHARED
-    ${SIDEBAR_FILES}
-)
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${DFM_BUILD_PLUGIN_FILEMANAGER_DIR})
-
-target_link_libraries(${PROJECT_NAME}
-    DFM::base
-    DFM::framework
-)
-
-#install library file
-install(TARGETS
-    ${PROJECT_NAME}
-    LIBRARY
-    DESTINATION
-    ${DFM_PLUGIN_FILEMANAGER_CORE_DIR}
-)
+# Qt6
+if (DFM_BUILD_WITH_QT6)
+    include(dfmplugin-sidebar-qt6.cmake)
+else()
+    include(dfmplugin-sidebar-qt5.cmake)
+endif()
 
 # install dconfig files.
 INSTALL_DCONFIG("org.deepin.dde.file-manager.sidebar.json")

@@ -10,24 +10,15 @@ FILE(GLOB_RECURSE CORE_FILES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.json"
     )
 
-find_package(Qt5 COMPONENTS Core)
-add_library(${PROJECT_NAME}
-    SHARED
-    ${CORE_FILES}
-)
+# Qt6
+if (DFM_BUILD_WITH_QT6)
+    include(dfmplugin-core-qt6.cmake)
+else()
+    include(dfmplugin-core-qt5.cmake)
+endif()
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${DFM_BUILD_PLUGIN_FILEMANAGER_DIR})
 
-target_link_libraries(${PROJECT_NAME}
-    DFM::base
-    DFM::framework
-)
 
-#install library file
-install(TARGETS
-    ${PROJECT_NAME}
-    LIBRARY
-    DESTINATION
-    ${DFM_PLUGIN_FILEMANAGER_CORE_DIR}
-)
+
+
+

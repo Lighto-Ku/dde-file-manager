@@ -19,7 +19,7 @@
 #include <FuzzyQuery.h>
 #include <QueryWrapperFilter.h>
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QDebug>
 #include <QDateTime>
 #include <QMetaEnum>
@@ -32,10 +32,10 @@
 #include <docparser.h>
 
 static constexpr char kFilterFolders[] = "^/(boot|dev|proc|sys|run|lib|usr).*$";
-static constexpr char kSupportFiles[] = "(rtf)|(odt)|(ods)|(odp)|(odg)|(docx)|(xlsx)|(pptx)|(ppsx)|(md)|"
+static constexpr char kSupportFiles[] = "^(rtf)|(odt)|(ods)|(odp)|(odg)|(docx)|(xlsx)|(pptx)|(ppsx)|(md)|"
                                         "(xls)|(xlsb)|(doc)|(dot)|(wps)|(ppt)|(pps)|(txt)|(pdf)|(dps)|"
                                         "(sh)|(html)|(htm)|(xml)|(xhtml)|(dhtml)|(shtm)|(shtml)|"
-                                        "(json)|(css)|(yaml)|(ini)|(bat)|(js)|(sql)|(uof)|(ofd)";
+                                        "(json)|(css)|(yaml)|(ini)|(bat)|(js)|(sql)|(uof)|(ofd)$";
 static int kMaxResultNum = 100000;   // 最大搜索结果数
 static int kEmitInterval = 50;   // 推送时间间隔
 
@@ -74,8 +74,8 @@ void FullTextSearcherPrivate::doIndexTask(const IndexReaderPtr &reader, const In
         return;
 
     // filter some folders
-    static QRegExp reg(kFilterFolders);
-    if (bindPathTable.contains(path) || (reg.exactMatch(path) && !path.startsWith("/run/user")))
+    static QRegularExpression reg(kFilterFolders);
+    if (bindPathTable.contains(path) || (reg.match(path).hasMatch() && !path.startsWith("/run/user")))
         return;
 
     // limit file name length and level
@@ -119,8 +119,8 @@ void FullTextSearcherPrivate::doIndexTask(const IndexReaderPtr &reader, const In
             if (!info) continue;
 
             QString suffix = info->nameOf(NameInfoType::kSuffix);
-            static QRegExp suffixRegExp(kSupportFiles);
-            if (suffixRegExp.exactMatch(suffix)) {
+            static QRegularExpression suffixRegExp(kSupportFiles);
+            if (suffixRegExp.match(suffix).hasMatch()) {
                 switch (type) {
                 case kCreate:
                     indexDocs(writer, fn, kAddIndex);
@@ -270,7 +270,7 @@ bool FullTextSearcherPrivate::createIndex(const QString &path)
 
     try {
         // record spending
-        QTime timer;
+        QElapsedTimer timer;
         timer.start();
         IndexWriterPtr writer = newIndexWriter(true);
         fmInfo() << "Indexing to directory: " << indexStorePath();
@@ -400,18 +400,18 @@ bool FullTextSearcherPrivate::doSearch(const QString &path, const QString &keywo
 
 QString FullTextSearcherPrivate::dealKeyword(const QString &keyword)
 {
-    static QRegExp cnReg("^[\u4e00-\u9fa5]");
-    static QRegExp enReg("^[A-Za-z]+$");
-    static QRegExp numReg("^[0-9]$");
+    static QRegularExpression cnReg("^[\u4e00-\u9fa5]");
+    static QRegularExpression enReg("^[A-Za-z]+$");
+    static QRegularExpression numReg("^[0-9]$");
 
     WordType oldType = kCn, currType = kCn;
     QString newStr;
     for (auto c : keyword) {
-        if (cnReg.exactMatch(c)) {
+        if (cnReg.match(c).hasMatch()) {
             currType = kCn;
-        } else if (enReg.exactMatch(c)) {
+        } else if (enReg.match(c).hasMatch()) {
             currType = kEn;
-        } else if (numReg.exactMatch(c)) {
+        } else if (numReg.match(c).hasMatch()) {
             currType = kDigit;
         } else {
             // 特殊符号均当作空格处理

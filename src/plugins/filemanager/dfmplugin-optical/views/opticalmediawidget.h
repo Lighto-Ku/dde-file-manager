@@ -9,12 +9,17 @@
 
 #include <dfm-base/widgets/filemanagerwindow.h>
 #include <dfm-base/utils/filestatisticsjob.h>
+  
+#include <DPushButton>
 
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QLabel>
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 #include <QSvgWidget>
-#include <DPushButton>
+#else()
+#include <QtSvgWidgets/QSvgWidget>
+#endif
 
 namespace dfmplugin_optical {
 

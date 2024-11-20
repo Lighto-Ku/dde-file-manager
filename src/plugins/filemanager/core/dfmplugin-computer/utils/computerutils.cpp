@@ -219,17 +219,17 @@ void ComputerUtils::setCursorState(bool busy)
 
 QStringList ComputerUtils::allValidBlockUUIDs()
 {
-    const auto &allBlocks = DevProxyMng->getAllBlockIds(GlobalServerDefines::DeviceQueryOption::kNotIgnored).toSet();
+    const auto &allBlocks = DevProxyMng->getAllBlockIds(GlobalServerDefines::DeviceQueryOption::kNotIgnored);
     QSet<QString> uuids;
-    std::for_each(allBlocks.cbegin(), allBlocks.cend(), [&](const QString &devId) {
+    for (const auto &devId : allBlocks) {
         const auto &&data = DevProxyMng->queryBlockInfo(devId);
         const auto &&uuid = data.value(GlobalServerDefines::DeviceProperty::kUUID).toString();
         // optical item not hidden by dconfig, its uuid might be empty.
         if (data.value(GlobalServerDefines::DeviceProperty::kOpticalDrive).toBool())
-            return;
+            return {};
         if (!uuid.isEmpty())
             uuids << uuid;
-    });
+    }
     return uuids.values();
 }
 
